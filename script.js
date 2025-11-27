@@ -1273,6 +1273,307 @@ RESULTS:
 
 11: {
     title: "Week 11 Content",
+    text: `WEEK - 11
+
+1) Using H2 Database (Project: h2db)
+
+Author.java
+
+package com.example.mysqldemo;
+
+public class Author {
+
+    private String firstName;
+    private String lastName;
+
+    public String getFirstName() {
+        return firstName;
+    }
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+    public String getLastName() {
+        return lastName;
+    }
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public Author(String firstName, String lastName) {
+        super();
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+}
+
+
+AuthorService.java
+
+package com.example.mysqldemo;
+
+import java.util.ArrayList;
+import java.util.List;
+import org.slf4j.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
+import jakarta.annotation.PostConstruct;
+
+@Service
+public class AuthorService {
+
+    private static final Logger log =
+            LoggerFactory.getLogger(AuthorService.class);
+
+    @Autowired
+    JdbcTemplate jdbcTemplate;
+
+    @PostConstruct
+    public void postConstruct() {
+
+        Author author1 = new Author("Prasanna", "IT");
+        Author author2 = new Author("Vyshnavi", "CSE");
+
+        List<Author> authors = new ArrayList<>();
+        authors.add(author1);
+        authors.add(author2);
+
+        log.info("Creating tables");
+
+        jdbcTemplate.execute("DROP TABLE IF EXISTS author");
+        jdbcTemplate.execute(
+                "CREATE TABLE author(" +
+                " first_name varchar(255), last_name varchar(255))"
+        );
+
+        authors.forEach(i ->
+                jdbcTemplate.update(
+                        "INSERT INTO author(first_name, last_name) VALUES (?, ?)",
+                        i.getFirstName(), i.getLastName()
+                )
+        );
+
+        log.info("Records Saved");
+
+        // retrieve saved records
+        log.info("Retrieving records");
+
+        authors = jdbcTemplate.query(
+                "SELECT * FROM author",
+                (rs, rowNum) ->
+                        new Author(
+                                rs.getString("first_name"),
+                                rs.getString("last_name")
+                        )
+        );
+
+        authors.forEach(i ->
+                log.info(i.getFirstName() + " " + i.getLastName())
+        );
+    }
+}
+
+
+application.properties (H2):
+
+server.port=83
+spring.application.name=h2db
+
+# H2 console
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console
+
+# Datasource Settings
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+
+spring.jpa.hibernate.ddl-auto=none
+
+
+OUTPUT (H2):
+
+<img src="images/week11img1.png">
+<img src="images/week11img2.png">
+<img src="images/week11img3.png">
+<img src="images/week11img4.png">
+
+
+
+2) JDBC with MySQL (Spring Boot JPA)
+
+
+Employee.java
+
+package com.example.demo;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+
+@Entity
+public class Employee {
+
+    @Id
+    private int id;
+    private String name;
+    private String department;
+
+    public Employee() {}
+
+    public Employee(int id, String name, String department) {
+        this.id         = id;
+        this.name       = name;
+        this.department = department;
+    }
+
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public String getDepartment() { return department; }
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+}
+
+
+EmployeeRepository.java
+
+package com.example.demo;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface EmployeeRepository
+        extends JpaRepository<Employee, Integer> {}
+
+
+MysqlJdbcDemoApplication.java
+
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class MysqlJdbcDemoApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(MysqlJdbcDemoApplication.class, args);
+        System.out.println("welcome");
+    }
+}
+
+
+application.properties (MySQL):
+
+spring.application.name=MysqlJdbcDemo
+server.port=85
+spring.datasource.url=jdbc:mysql://localhost:3306/employee_db?useSSL=false&serverTimezone=UTC
+spring.datasource.username=root
+spring.datasource.password=
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.jpa.hibernate.ddl-auto=none
+spring.jpa.show-sql=true
+spring.sql.init.mode=always
+spring.jpa.defer-datasource-initialization=true
+
+
+DATABASE (MySQL):
+
+CREATE DATABASE employee_db;
+USE employee_db;
+
+CREATE TABLE IF NOT EXISTS employee (
+    id INT PRIMARY KEY,
+    name VARCHAR(255),
+    department VARCHAR(255)
+);
+
+data.sql:
+
+INSERT INTO employee (id, name, department) VALUES
+(1, 'Prasanna', 'IT'),
+(2, 'Vyshnavi', 'CSE'),
+(3, 'Devika', 'ECE');
+
+
+pom.xml (important parts):
+
+<project ...>
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.5.7</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.example</groupId>
+    <artifactId>MysqlJdbcDemo</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>MysqlJdbcDemo</name>
+    <description>Servlet + HttpSession + JPA + H2 demo</description>
+
+    <properties>
+        <java.version>17</java.version>
+    </properties>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jdbc</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.49</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+
+
+Run URL:
+
+http://localhost:85/employees
+
+OUTPUT (MySQL):
+
+<img src="images/week11img5.png">
+<img src="images/week11img6.png">`,
+    pdf: "pdfs/week11.docx"
 },
 
 12: {
@@ -1306,3 +1607,4 @@ buttons.forEach(btn => {
 });
 
 loadWeek(1);
+
