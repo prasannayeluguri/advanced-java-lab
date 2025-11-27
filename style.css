@@ -1,0 +1,140 @@
+/* General */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+body {
+    background: #f2f5ff;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 20px auto;
+}
+
+/* HEADER */
+.header {
+    background: #3f51f5;
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+    position: relative;          /* for absolute positioning of photo */
+    min-height: 150px;
+}
+
+/* Centered heading text */
+.header-text {
+    text-align: center;
+}
+
+.header-text h1 {
+    font-size: 26px;
+    margin-bottom: 5px;
+}
+
+.header-text p {
+    font-size: 15px;
+}
+
+/* Profile image at top-right */
+.profile-container {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 90px;
+    height: 90px;
+}
+
+.profile-pic {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+}
+
+/* WEEK BUTTONS */
+.week-tabs {
+    margin-top: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.week-tab {
+    padding: 8px 18px;
+    border-radius: 25px;
+    border: none;
+    background: white;
+    cursor: pointer;
+    font-size: 14px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: 0.2s;
+}
+
+.week-tab:hover {
+    transform: translateY(-1px);
+}
+
+.week-tab.active {
+    background: #3f51f5;
+    color: white;
+}
+
+/* CONTENT BOX */
+.content-box {
+    margin-top: 20px;
+    background: white;
+    padding: 20px 25px 25px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.content-box h2 {
+    margin-bottom: 12px;
+}
+
+/* Scrollable content area */
+.content-area {
+    background: #fafafa;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+#week-content {
+    white-space: pre-wrap;
+}
+
+/* Download button */
+.download-btn {
+    margin-top: 16px;
+    display: inline-block;
+    background: #3f51f5;
+    color: white;
+    padding: 10px 22px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.2s;
+}
+
+.download-btn:hover {
+    background: #3240c0;
+}
+
+/* Styling for images inside week content */
+#week-content img {
+    width: 100%;           /* Fit inside box */
+    max-width: 600px;      /* Limit maximum size */
+    display: block;        /* New line, no inline issues */
+    margin: 12px auto;     /* Center image */
+    border-radius: 10px;   /* Smooth corners */
+    border: 1px solid #ccc; /* Light border */
+}
