@@ -1578,6 +1578,157 @@ OUTPUT (MySQL):
 
 12: {
     title: "Week 12 Content",
+    text: `WEEK - 12
+
+SPRING JPA WITH RELATIONAL DATABASE
+
+1) application.properties
+spring.application.name=jpamysql
+server.port=88
+spring.datasource.url=jdbc:mysql://localhost:3306/employee_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+spring.datasource.username=root
+spring.datasource.password=
+spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+
+2) MySQL Database & Sample Data
+CREATE DATABASE IF NOT EXISTS testdb;
+USE employee_db;
+CREATE TABLE IF NOT EXISTS employee (
+ id INT PRIMARY KEY AUTO_INCREMENT,
+ name VARCHAR(100),
+ department VARCHAR(100)
+);
+INSERT INTO employee (name, department) VALUES
+('Manogna','IT'),
+('Keerthi','CSE'),
+('Sai','ECE');
+
+3) Employee.java
+package com.example.demo;
+import jakarta.persistence.*;
+@Entity
+public class Employee {
+ @Id
+ @GeneratedValue(strategy = GenerationType.IDENTITY)
+ private Integer id;
+ private String name;
+ private String department;
+ public Employee() {}
+ public Employee(String name, String department) { this.name = name; this.department = department; }
+ public Integer getId() { return id; }
+ public void setId(Integer id) { this.id = id; }
+ public String getName() { return name; }
+ public void setName(String name) { this.name = name; }
+ public String getDepartment() { return department; }
+ public void setDepartment(String department) { this.department = department; }
+}
+
+4) EmployeeRepository.java
+package com.example.demo;
+import org.springframework.data.jpa.repository.JpaRepository;
+public interface EmployeeRepository extends JpaRepository<Employee, Integer> { }
+
+5) Controllers
+@RestController
+@RequestMapping("/api")
+class EmployeeRestController {
+ @Autowired
+ private EmployeeRepository repo;
+ @GetMapping("/employees")
+ public List<Employee> getAll() { return repo.findAll(); }
+}
+@Controller
+class EmployeeViewController {
+ @Autowired
+ private EmployeeRepository repo;
+ @GetMapping("/employees")
+ public String employeesPage(Model model) {
+  model.addAttribute("employees", repo.findAll());
+  return "employees";
+ }
+}
+
+7) pom.xml additions
+<dependency>
+ <groupId>mysql</groupId>
+ <artifactId>mysql-connector-java</artifactId>
+ <version>5.1.49</version>
+</dependency>
+<dependency>
+ <groupId>org.springframework.boot</groupId>
+ <artifactId>spring-boot-starter-thymeleaf</artifactId>
+</dependency>
+
+8) Run Project
+HTML: http://localhost:88/employees
+API: http://localhost:88/api/employees
+
+OUTPUT (MySQL JPA):
+<img src="images/week12img5.png">
+
+SPRING JPA WITH H2 DATABASE (Project: h2db-jpa)
+
+Student.java
+package com.example.mysqldemo;
+import jakarta.persistence.*;
+@Entity
+public class Student {
+ @Id
+ @GeneratedValue(strategy = GenerationType.IDENTITY)
+ private Long id;
+ private String name;
+ private String city;
+ public Student() {}
+ public Student(String name, String city) { this.name = name; this.city = city; }
+ public Long getId() { return id; }
+ public void setId(Long id) { this.id = id; }
+ public String getName() { return name; }
+ public void setName(String name) { this.name = name; }
+ public String getCity() { return city; }
+ public void setCity(String city) { this.city = city; }
+}
+
+StudentController.java
+package com.example.mysqldemo;
+@RestController
+public class StudentController {
+ @Autowired
+ private StudentRepository repo;
+ @GetMapping("/")
+ public String home() { return "Spring Boot + H2 + JPA Example Running!"; }
+ @GetMapping("/add")
+ public String addStudent(@RequestParam String name, @RequestParam String city) {
+  repo.save(new Student(name, city));
+  return "Student Added Successfully!";
+ }
+ @GetMapping("/students")
+ public List<Student> getStudents() { return repo.findAll(); }
+}
+
+StudentRepository.java
+package com.example.mysqldemo;
+import org.springframework.data.jpa.repository.JpaRepository;
+public interface StudentRepository extends JpaRepository<Student, Long> { }
+
+H2 application.properties
+spring.application.name=h2db-jpa
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=prasanna
+spring.datasource.password=
+spring.jpa.hibernate.ddl-auto=update
+
+OUTPUT (H2 JPA):
+<img src="images/week12img1.png">
+<img src="images/week12img2.png">
+<img src="images/week12img3.png">
+<img src="images/week12img4.png">`,
+    pdf: "pdfs/week12.docx"
 },
 
 };
@@ -1607,4 +1758,5 @@ buttons.forEach(btn => {
 });
 
 loadWeek(1);
+
 
